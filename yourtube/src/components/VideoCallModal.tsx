@@ -48,7 +48,7 @@ export default function VideoCallModal({
   });
 
   const { isRecording, startRecording, stopRecording } = useCallRecording(
-    localStream || undefined
+    localStream || null
   );
 
   // ── Attach local stream to video element ──────────────────────────────────

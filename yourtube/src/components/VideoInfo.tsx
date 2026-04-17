@@ -151,19 +151,22 @@ const VideoInfo = ({ video }: any) => {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">{video.videotitle}</h1>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-10 h-10">
-            <AvatarFallback>{video.videochanel[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="font-medium">{video.videochanel}</h3>
-            <p className="text-sm text-gray-600">1.2M subscribers</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="w-10 h-10">
+              <AvatarFallback>{video.videochanel?.[0] || "U"}</AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="font-medium">{video.videochanel}</h3>
+              <p className="text-sm text-gray-600">1.2M subscribers</p>
+            </div>
           </div>
-          <Button className="ml-4">Subscribe</Button>
+          <Button className="ml-auto md:ml-4 bg-black text-white rounded-full hover:bg-gray-800">Subscribe</Button>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 rounded-full">
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar w-full md:w-auto shrink-0">
+          <div className="flex items-center bg-gray-100 rounded-full shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -195,7 +198,7 @@ const VideoInfo = ({ video }: any) => {
           <Button
             variant="ghost"
             size="sm"
-            className={`bg-gray-100 rounded-full ${
+            className={`bg-gray-100 rounded-full shrink-0 ${
               isWatchLater ? "text-primary" : ""
             }`}
             onClick={handleWatchLater}
@@ -206,7 +209,7 @@ const VideoInfo = ({ video }: any) => {
           <Button
             variant="ghost"
             size="sm"
-            className="bg-gray-100 rounded-full"
+            className="bg-gray-100 rounded-full shrink-0"
           >
             <Share className="w-5 h-5 mr-2" />
             Share
@@ -214,7 +217,7 @@ const VideoInfo = ({ video }: any) => {
           <Button
             variant="ghost"
             size="sm"
-            className="bg-gray-100 rounded-full"
+            className="bg-gray-100 rounded-full shrink-0"
             onClick={handleDownload}
             disabled={isDownloading || !user}
             title={!user ? "Sign in to download" : ""}
@@ -226,7 +229,7 @@ const VideoInfo = ({ video }: any) => {
           <Button
             variant="ghost"
             size="icon"
-            className="bg-gray-100 rounded-full"
+            className="bg-gray-100 rounded-full shrink-0"
           >
             <MoreHorizontal className="w-5 h-5" />
           </Button>

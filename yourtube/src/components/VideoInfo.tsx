@@ -12,6 +12,8 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "@/lib/AuthContext";
 import axiosInstance from "@/lib/axiosinstance";
+import PremiumUpgradeModal from "./PremiumUpgradeModal";
+
 
 const VideoInfo = ({ video }: any) => {
   const [likes, setlikes] = useState(video.Like || 0);
@@ -21,6 +23,10 @@ const VideoInfo = ({ video }: any) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { user } = useUser();
   const [isWatchLater, setIsWatchLater] = useState(false);
+  // Task 2: Download state
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
 
   // const user: any = {
   //   id: "1",
@@ -111,6 +117,36 @@ const VideoInfo = ({ video }: any) => {
       console.log(error);
     }
   };
+  // Task 2: Handle download
+  const handleDownload = async () => {
+    if (!user) return;
+    setIsDownloading(true);
+    try {
+      const response = await axiosInstance.get(
+        `/download/${video._id}?userId=${user._id}`,
+        { responseType: "blob" }
+      );
+      // Trigger browser file download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${video.videotitle}.mp4`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      if (error?.response?.status === 403) {
+        // Daily limit reached — show upgrade modal
+        setShowPremiumModal(true);
+      } else {
+        console.error("Download error:", error);
+      }
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">{video.videotitle}</h1>
@@ -179,10 +215,14 @@ const VideoInfo = ({ video }: any) => {
             variant="ghost"
             size="sm"
             className="bg-gray-100 rounded-full"
+            onClick={handleDownload}
+            disabled={isDownloading || !user}
+            title={!user ? "Sign in to download" : ""}
           >
             <Download className="w-5 h-5 mr-2" />
-            Download
+            {isDownloading ? "Downloading..." : "Download"}
           </Button>
+
           <Button
             variant="ghost"
             size="icon"
@@ -212,6 +252,18 @@ const VideoInfo = ({ video }: any) => {
           {showFullDescription ? "Show less" : "Show more"}
         </Button>
       </div>
+
+      {/* Task 2: Premium upgrade modal */}
+      {showPremiumModal && (
+        <PremiumUpgradeModal
+          onClose={() => setShowPremiumModal(false)}
+          onSuccess={() => {
+            setShowPremiumModal(false);
+            // Retry download after upgrade
+            handleDownload();
+          }}
+        />
+      )}
     </div>
   );
 };

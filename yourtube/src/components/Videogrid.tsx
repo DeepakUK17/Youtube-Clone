@@ -48,9 +48,24 @@ const Videogrid = () => {
   //   },
   // ];
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
       {loading ? (
-        <>Loading..</>
+        // Loading skeletons
+        Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="bg-gray-100 rounded-xl animate-pulse">
+            <div className="aspect-video bg-gray-200 rounded-t-xl" />
+            <div className="p-3 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
+            </div>
+          </div>
+        ))
+      ) : !videos || videos.length === 0 ? (
+        <div className="col-span-4 flex flex-col items-center justify-center py-20 text-gray-400">
+          <p className="text-4xl mb-3">🎬</p>
+          <p className="text-sm">No videos uploaded yet.</p>
+          <p className="text-xs mt-1">Upload your first video to get started!</p>
+        </div>
       ) : (
         videos.map((video: any) => <Videocard key={video._id} video={video} />)
       )}

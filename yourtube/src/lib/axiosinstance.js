@@ -1,6 +1,5 @@
 import axios from "axios";
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_URL,
- 
+  baseURL: "/", // Use relative path to hit Next.js rewrites proxy
 });
 export default axiosInstance;

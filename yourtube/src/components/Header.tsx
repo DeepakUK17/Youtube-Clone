@@ -1,5 +1,6 @@
-import { Bell, Menu, Mic, Search, User, VideoIcon } from "lucide-react";
-import React, { useState } from "react";
+import { Bell, Menu, Mic, Moon, Search, Sun, User, Plus } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Input } from "./ui/input";
@@ -17,15 +18,20 @@ import { useUser } from "@/lib/AuthContext";
 
 const Header = () => {
   const { user, logout, handlegooglesignin } = useUser();
-  // const user: any = {
-  //   id: "1",
-  //   name: "John Doe",
-  //   email: "john@example.com",
-  //   image: "https://github.com/shadcn.png?height=32&width=32",
-  // };
-  const [searchQuery, setSearchQuery] = useState("");
+  const { theme, isSouth }  = useTheme();
+  const [searchQuery,   setSearchQuery]   = useState("");
   const [isdialogeopen, setisdialogeopen] = useState(false);
+  const [manualTheme,   setManualTheme]   = useState<"light"|"dark">("light");
   const router = useRouter();
+
+  // Manual theme toggle — overrides auto-detection
+  const toggleTheme = () => {
+    const next = manualTheme === "light" ? "dark" : "light";
+    setManualTheme(next);
+    document.documentElement.setAttribute("data-theme", next);
+    document.body.style.backgroundColor = next === "dark" ? "#0f0f0f" : "#ffffff";
+    document.body.style.color = next === "dark" ? "#f1f1f1" : "#111111";
+  };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -37,10 +43,23 @@ const Header = () => {
       handleSearch(e as any);
     }
   };
+
+  const handleVideoAction = () => {
+    if (user?.channelname) {
+    router.push(`/channel/${user._id}`);
+    } else {
+      setisdialogeopen(true);
+    }
+  };
+
+  const handleMenuToggle = () => {
+    window.dispatchEvent(new Event("toggleSidebar"));
+  };
+
   return (
-    <header className="flex items-center justify-between px-4 py-2 bg-white border-b">
+    <header className="flex items-center justify-between px-4 py-2 header-theme border-b transition-colors duration-300">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={handleMenuToggle}>
           <Menu className="w-6 h-6" />
         </Button>
         <Link href="/" className="flex items-center gap-1">
@@ -55,7 +74,7 @@ const Header = () => {
       </div>
       <form
         onSubmit={handleSearch}
-        className="flex items-center gap-2 flex-1 max-w-2xl mx-4"
+        className="hidden md:flex items-center gap-2 flex-1 max-w-2xl mx-4"
       >
         <div className="flex flex-1">
           <Input
@@ -78,12 +97,31 @@ const Header = () => {
         </Button>
       </form>
       <div className="flex items-center gap-2">
+        {/* Task 4: Theme Toggle + indicator */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            title={`Switch to ${manualTheme === 'light' ? 'dark' : 'light'} mode`}
+            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+          >
+            {manualTheme === "dark" ? (
+              <Sun className="w-5 h-5 text-yellow-500" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+          {isSouth && (
+            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full hidden sm:block">
+              🌏 South India
+            </span>
+          )}
+        </div>
         {user ? (
           <>
-            <Button variant="ghost" size="icon">
-              <VideoIcon className="w-6 h-6" />
+            <Button variant="ghost" size="icon" onClick={handleVideoAction}>
+              <Plus className="w-6 h-6" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={() => alert("No new notifications")}>
               <Bell className="w-6 h-6" />
             </Button>
             <DropdownMenu>
@@ -113,6 +151,19 @@ const Header = () => {
                     >
                       Create Channel
                     </Button>
+                  </div>
+                )}
+                {user?.isPremium && (
+                  <div className="px-2 py-1.5 mb-1 flex justify-center">
+                    <span className={`text-[10px] font-extrabold uppercase px-3 py-1 rounded-full border shadow-sm ${
+                      user.plan === 'gold' 
+                        ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 border-yellow-300 text-yellow-700'
+                        : user.plan === 'silver'
+                        ? 'bg-gradient-to-r from-slate-100 to-slate-50 border-slate-300 text-slate-700'
+                        : 'bg-gradient-to-r from-orange-100 to-orange-50 border-orange-300 text-orange-700'
+                    }`}>
+                      {user.plan} MEMBER
+                    </span>
                   </div>
                 )}
                 <DropdownMenuItem asChild>

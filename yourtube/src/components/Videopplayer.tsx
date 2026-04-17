@@ -140,7 +140,7 @@ export default function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-video bg-black rounded-lg overflow-hidden select-none cursor-pointer"
+      className="relative aspect-video bg-black rounded-none md:rounded-lg overflow-hidden select-none cursor-pointer"
       onClick={handleTap}
       onTouchEnd={handleTap}
     >

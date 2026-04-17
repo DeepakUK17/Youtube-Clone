@@ -74,23 +74,25 @@ const WatchPage = () => {
 
   return (
     <div className="flex-1 min-h-screen transition-colors duration-300">
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto px-0 md:px-4 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 md:gap-6">
           {/* ── Left: Player + Info + Comments ── */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 flex flex-col">
             <Videopplayer
               video={currentVideo}
               onNextVideo={handleNextVideo}
               onOpenComments={handleOpenComments}
             />
-            <VideoInfo video={currentVideo} />
-            <div ref={commentsRef}>
+            <div className="px-4 md:px-0 mt-4">
+              <VideoInfo video={currentVideo} />
+            </div>
+            <div className="px-4 md:px-0 mt-4" ref={commentsRef}>
               <Comments videoId={id as string} />
             </div>
           </div>
 
           {/* ── Right: Related Videos ── */}
-          <div className="space-y-4">
+          <div className="px-4 md:px-0 mt-6 lg:mt-0 space-y-4">
             <RelatedVideos videos={allVideos.filter((v: any) => v._id !== currentVideo._id)} />
           </div>
         </div>
